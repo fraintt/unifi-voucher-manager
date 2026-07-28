@@ -1,10 +1,10 @@
 @import "../globals.css";
 
-/* Print page settings */
+/* ─── Print page settings ─────────────────────────────────────────────────── */
 @media print {
   @page {
-    size: auto;
-    margin: 4; /* ~3mm is too fine; browsers usually round to ~4px */
+    size: A4 portrait;
+    margin: 10mm;
   }
   html,
   body {
@@ -16,23 +16,75 @@
     background: white !important;
     color: black !important;
   }
+
+  /* In grid mode: keep every group-of-4 on one page */
+  .print-page-group {
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-page-group:last-child {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+
+  /* Never break a single voucher card across pages */
+  .print-voucher {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
 }
 
+/* ─── Shared wrapper ──────────────────────────────────────────────────────── */
 .print-wrapper {
-  @apply p-3 m-0 p-0 bg-white text-black font-mono text-sm leading-snug;
+  @apply p-0 m-0 bg-white text-black font-mono text-sm leading-snug;
 }
 
+/* ─── List mode ───────────────────────────────────────────────────────────── */
 .print-list {
   @apply flex flex-col gap-3 max-w-[80mm] mx-auto;
 }
+
+/* ─── Grid mode ───────────────────────────────────────────────────────────── */
+/*
+ * Grid mode renders vouchers in explicit groups of 4 (2 columns × 2 rows).
+ * Each group becomes its own page-break-after block so vouchers never split
+ * across pages regardless of content height or paper size.
+ */
 .print-grid {
-  @apply grid gap-3 grid-cols-[repeat(auto-fill,minmax(250px,1fr))];
+  /* Container holds multiple .print-page-group blocks, one per page */
+  display: block;
 }
 
+.print-page-group {
+  /* 2-column grid that fills the available width evenly */
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 6mm;
+  /* Keep all four cards on one physical page */
+  min-height: 0;
+}
+
+/* ─── Voucher card ────────────────────────────────────────────────────────── */
 .print-voucher {
   @apply border-2 border-black p-3;
+  /* Prevent internal overflow from expanding beyond the grid cell */
+  overflow: hidden;
+  min-width: 0;
 }
 
+/* ─── Header logo ─────────────────────────────────────────────────────────── */
+.print-logo-header {
+  @apply flex justify-center items-center pb-2 mb-2 border-b-2 border-black;
+}
+.print-logo-img {
+  max-height: 36px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* ─── Card header ─────────────────────────────────────────────────────────── */
 .print-header {
   @apply text-center border-b-2 border-black pb-1;
 }
@@ -40,10 +92,12 @@
   @apply font-bold text-lg;
 }
 
+/* ─── Voucher code ────────────────────────────────────────────────────────── */
 .print-voucher-code {
   @apply text-xl font-bold text-center border-2 border-black p-1 my-3;
 }
 
+/* ─── Info rows ───────────────────────────────────────────────────────────── */
 .print-info-row {
   @apply flex justify-between my-1.5 border-b border-dotted border-black;
 }
@@ -54,6 +108,7 @@
   @apply flex-1 text-right;
 }
 
+/* ─── QR section ──────────────────────────────────────────────────────────── */
 .print-qr-section {
   @apply flex flex-col items-center justify-center my-3 border-t-2 border-black pt-2;
 }
@@ -61,7 +116,7 @@
   @apply text-center text-xs mt-2 break-all;
 }
 
-/* Footer */
+/* ─── Footer ──────────────────────────────────────────────────────────────── */
 .print-footer {
   @apply text-left border-t-2 border-black pt-2 text-xs;
 }

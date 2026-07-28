@@ -54,6 +54,12 @@ function VoucherPrintCard({ voucher }: { voucher: Voucher }) {
 
   return (
     <div className="print-voucher">
+      {printConfig.showHeaderLogo && (
+        <div className="print-logo-header">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.svg" alt="Logo" className="print-logo-img" />
+        </div>
+      )}
       <div className="print-header">
         <div className="print-title">WiFi Access Voucher</div>
       </div>
@@ -80,7 +86,7 @@ function VoucherPrintCard({ voucher }: { voucher: Voucher }) {
               <div className="font-bold mb-2">Scan to Connect</div>
               <WifiQr
                 sizeRatio={0.85}
-                imageSrc={printConfig.showLogo ? undefined : ""}
+                imageSrc={printConfig.showQrLogo ? undefined : ""}
               />
             </>
           )}
@@ -192,10 +198,31 @@ function Vouchers() {
     }
   })();
 
-  return !vouchers.length ? (
-    <div style={{ textAlign: "center" }}>{emptyMessage}</div>
-  ) : (
-    <div className={mode === "grid" ? "print-grid" : "print-list"}>
+  if (!vouchers.length) {
+    return <div style={{ textAlign: "center" }}>{emptyMessage}</div>;
+  }
+
+  if (mode === "grid") {
+    // Chunk vouchers into groups of 4 — each group becomes one printed page
+    const pages: Voucher[][] = [];
+    for (let i = 0; i < vouchers.length; i += 4) {
+      pages.push(vouchers.slice(i, i + 4));
+    }
+    return (
+      <div className="print-grid">
+        {pages.map((pageVouchers, pageIndex) => (
+          <div key={pageIndex} className="print-page-group">
+            {pageVouchers.map((v) => (
+              <VoucherPrintCard key={v.id} voucher={v} />
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="print-list">
       {vouchers.map((v) => (
         <VoucherPrintCard key={v.id} voucher={v} />
       ))}
