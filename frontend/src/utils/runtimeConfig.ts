@@ -7,13 +7,28 @@ import path from "path";
 let cachedConfig: RuntimeConfig | null = null;
 
 function withDefaults(config: Partial<RuntimeConfig>): RuntimeConfig {
+  const mergedPrint = {
+    ...DEFAULT_RUNTIME_CONFIG.PRINT_CONFIG,
+    ...config.PRINT_CONFIG,
+  };
+
+  // Backwards-compat: if only the legacy `showLogo` field is present (no new
+  // fields), propagate its value to both new fields so existing configs work.
+  if (
+    config.PRINT_CONFIG &&
+    "showLogo" in config.PRINT_CONFIG &&
+    !("showHeaderLogo" in config.PRINT_CONFIG) &&
+    !("showQrLogo" in config.PRINT_CONFIG)
+  ) {
+    const legacy = (config.PRINT_CONFIG as { showLogo?: boolean }).showLogo ?? true;
+    mergedPrint.showHeaderLogo = legacy;
+    mergedPrint.showQrLogo = legacy;
+  }
+
   return {
     ...DEFAULT_RUNTIME_CONFIG,
     ...config,
-    PRINT_CONFIG: {
-      ...DEFAULT_RUNTIME_CONFIG.PRINT_CONFIG,
-      ...config.PRINT_CONFIG,
-    },
+    PRINT_CONFIG: mergedPrint,
   };
 }
 
