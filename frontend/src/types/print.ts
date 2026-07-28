@@ -9,7 +9,12 @@ export type PrintJob = {
 };
 
 export type PrintConfig = {
-  showLogo: boolean;
+  /** @deprecated Use showHeaderLogo / showQrLogo instead */
+  showLogo?: boolean;
+  /** Show a logo image at the top of each printed voucher */
+  showHeaderLogo: boolean;
+  /** Show a logo image embedded inside the WiFi QR code */
+  showQrLogo: boolean;
   showDuration: boolean;
   showMaxGuests: boolean;
   showDataUsageLimit: boolean;

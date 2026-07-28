@@ -12,7 +12,10 @@ export type RuntimeConfig = {
 export const DEFAULT_RUNTIME_CONFIG: RuntimeConfig = {
   IS_LOGO_INVERTIBLE: false,
   PRINT_CONFIG: {
+    // Legacy field kept for backwards-compat; new fields take precedence
     showLogo: true,
+    showHeaderLogo: true,
+    showQrLogo: true,
     showDuration: true,
     showMaxGuests: true,
     showDataUsageLimit: true,
